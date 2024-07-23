@@ -1,0 +1,29 @@
+version: '3.8' # version of docker compose
+services:
+  db:
+    image: mysql:latest
+    restart: always
+    container_name: mysql-server # name of mysql container
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root # password of mysql server (enter in phpmyadmin)
+      - MYSQL_DATABASE=brainbloomDatabase
+    volumes:
+      #- ./sql_dump:/docker-entrypoint-initdb.d # persistant import of sql files (in /sql_dump) into container
+      - ./db:/var/lib/mysql # saves the database to persistant storage for backup (/db)
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    container_name: phpadmin
+    environment:
+      - PMA_ARBITRARY=1 # allow to enter ip address 
+    ports:
+      - "8080:80" # http://localhost:8080 to run phpadmin (do 'docker inspect mysql-server' to get ip address of the mysql server)
+
+# docker-compose up - runs the containers
+# docker-compose down - stops the containers
+
+# important reminder: export the brainbloomDatabase in the phpMyAdmin 
+# and put the brainbloomDatabase.sql exported table into db folder (replace the old .sql file)
+# before stopping the containers in order to save your db (in case the container volumne is cleared)
